@@ -30,6 +30,6 @@ File/Folder         |  Explanation
 js/calculator.js    | main file to be included on the page
 js/templates/*.html | these are the html files that comprise the user interface of the module.
                       
-ideally this could be setup as some kind of dependency within the mini.ca project (node + npm?) so that it could be
-updated really quickly and easily.
+ideally this could be setup as some kind of dependency within the mini.ca project (node + browserify) so that it could be
+updated really quickly and easily but kept in seperate standalone repo's
 
