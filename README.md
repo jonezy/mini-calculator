@@ -5,6 +5,14 @@ builds can and should be a reusable component.
 
 This project is built using backbone, underscore and jquery (same as mini.ca)
 
+#### Potential Problems
+
+1. All of the calculator code for buildmymini.ca is spread across multiple files.
+  - helpers, vehicles, calculator etc. 
+2. The buildmymini.ca calculator depends on buildmymini.ca data
+  - Going to have to externalize all the data.
+3. This might not even work/be possible.
+
 # Goals
 
 1. The ability to do this:
