@@ -1,7 +1,5 @@
-﻿/* 
-*   decimal_sep: character used as deciaml separtor, it defaults to '.' when omitted
-*     thousands_sep: char used as thousands separator, it defaults to ',' when omitted
-*       */
+﻿// need to figure out what to do with these helpers, namespace and toMoney stuff
+//
 Number.prototype.toMoney = function (decimals, decimal_sep, thousands_sep) {
   var n = this,
   l = 'en',
@@ -93,7 +91,6 @@ var app = {
     domain: 'http://0.0.0.0:8000',
     lang: 'en'
   }
-
 };
 
 var namespace = {
@@ -119,9 +116,30 @@ var namespace = {
     return def.promise();
   }
 };
+Backbone.View.prototype.close = function () {
+  // close all the child views that have been stored in this.childViews
+  _.each(this.childViews, function (childView) {
+    if (childView.remove) {
+      childView.remove();
+    }
+
+    if (childView.close) {
+      childView.close();
+    }
+  });
+
+  // handle cleaning up this view
+  this.off();
+  this.remove();
+
+  if (this.onClose) {
+    this.onClose();
+  }
+
+  return this;
+};
 
 var Calculator = namespace.module();
-Calculator.Data = {};
 
 Calculator.Model = Backbone.Model.extend({
   defaults: function () {
@@ -138,9 +156,6 @@ Calculator.Model = Backbone.Model.extend({
 
 Calculator.Collection = Backbone.Collection.extend({ model: Calculator.Model });
 
-// The lease and finance calculator inherit from this base class
-// it provides shared functionality and allows us to not repeat 
-// ourselves
 Calculator.Views.BaseCalculatorView = Backbone.View.extend({
   className: 'calc-wrapper modal-body',
   events: {
@@ -149,16 +164,14 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
     "click button#caclulatePayment": "calculatePayment"
   },
 
-  // repopulates the model based on the new term
   lookupNewTerm: function (newTerm, nodeToSearch) {
     var newModel = new Calculator.Model(),
-    that = this,
-    leaseRate;
+        that = this,
+        leaseRate;
 
-    console.log(this.options.data[nodeToSearch]);
     _.each(this.options.data[nodeToSearch], function (lr) {
       if (lr.Term === parseInt(newTerm)) {
-        return leaseRate = lr;
+        leaseRate = lr;
       }
     });
 
@@ -184,19 +197,14 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
       newModel.set({ kms: 20 });
     }
 
-    console.log(typeof(newModel.get('price')));
-
     this.model = newModel;
   },
 
-  // determines whether the current vehicle has any 48 month term rates.
-  // the button is removed fromt eh UI if none are found.
   hasTerm48: function (nodeToSearch) {
     var hasTerm48 = false;
-
     _.each(this.options.data[nodeToSearch], function (lr) {
       if (parseInt(lr.Term) === 48) {
-        return hasTerm48 = true;
+        hasTerm48 = true;
       }
     });
 
@@ -207,18 +215,16 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
     var hasTerm = false;
     _.each(this.options.data[nodeToSearch], function (lr) {
       if (parseInt(lr.Term) === termToSearchFor) {
-        return hasTerm = true;
+        hasTerm = true;
       }
     });
 
     return hasTerm;
   },
 
-  // updates the view's model downPayment and term amounts.
   setTerm: function (e) {
     e.preventDefault();
 
-    var view = this,
     srcElement = e.srcElement ? e.srcElement : e.target,
     $srcElement = $(srcElement),
     newDownPayment = this.$el.find('#txtDownPmt').val();
@@ -249,13 +255,13 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
 
 Calculator.Views.LeaseCalculator = Calculator.Views.BaseCalculatorView.extend({
   template: app.configuration.domain + "/j/calculator-templates/lease_calc.html",
+
   initialize: function () {
     this.type = 'LeaseRates';
     this.lookupNewTerm('48', this.type);
   },
 
   render: function () {
-    console.log(this.model.get('kms'));
     var view = this,
     monthlyPayment = Helpers.fullCalculateLeaseRate(this.model.get('interestRate'), this.model.get('residual'), this.model.get('term'), this.model.get('price'), this.model.get('downPayment'), this.model.get('kms')),
     formattedTotalPrice = this.model.get('price').toMoney();
@@ -267,7 +273,7 @@ Calculator.Views.LeaseCalculator = Calculator.Views.BaseCalculatorView.extend({
         displayPrice: formattedTotalPrice,
         showTerm48: view.hasTerm48('LeaseRates'),
         showTerm39: view.hasTerm('LeaseRates', 39),
-        strings: {},
+        strings: view.options.strings,
         lang: app.configuration.language
       });
 
@@ -280,6 +286,7 @@ Calculator.Views.LeaseCalculator = Calculator.Views.BaseCalculatorView.extend({
 
 Calculator.Views.FinanceCalculator = Calculator.Views.BaseCalculatorView.extend({
   template: app.configuration.domain + "/j/calculator-templates/finance_calc.html",
+
   initialize: function () {
     this.type = 'FinanceRates';
     this.lookupNewTerm('60', this.type);
@@ -301,7 +308,7 @@ Calculator.Views.FinanceCalculator = Calculator.Views.BaseCalculatorView.extend(
         data: view.model.toJSON(),
         payment: parseFloat(monthlyPayment).toMoney(),
         displayPrice: formattedTotalPrice,
-        strings: {},
+        strings: view.options.strings,
         variableTerms: additionalTerms,
         lang: app.configuration.language
       });
@@ -315,6 +322,8 @@ Calculator.Views.FinanceCalculator = Calculator.Views.BaseCalculatorView.extend(
 
 // This is the main calculator view, it loads subviews and builds the whole calculator UI.
 Calculator.Views.Main = Backbone.View.extend({
+  id: 'calculator-window',
+
   events: {
     "click #show-lease": "showLeaseCalculator",
     "click #show-finance": "showFinanceCalculator",
@@ -332,53 +341,39 @@ Calculator.Views.Main = Backbone.View.extend({
     if(typeof(this.options.data) !== 'object')
       this.options.data = JSON.parse(this.options.data);
 
+    this.$container = $(this.options.container);
+
+    console.log('about to render', this);
     this.render();
   },
 
   render: function () {
-    var header = new Calculator.Views.Header({ type: this.options.type });
+    var header = new Calculator.Views.Header({ type: this.options.type, strings:this.options.strings });
     header.render();
     this.childViews.push(header);
     this.$el.html(header.el);
 
-    var leaseCalculator, financeCalculator;
+    var leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data, strings:this.options.strings}).render();
+    var financeCalculator = new Calculator.Views.FinanceCalculator({data:this.options.data, strings:this.options.strings}).render();
+    this.childViews.push(leaseCalculator);
+    this.childViews.push(financeCalculator);
+
     switch (this.options.type) {
       case 'lease':
-        leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data});
-        leaseCalculator.render();
         this.$el.append(leaseCalculator.el);
-        this.childViews.push(leaseCalculator);
-
-        financeCalculator = new Calculator.Views.FinanceCalculator({data:this.options.data});
-        financeCalculator.render();
         this.$el.append(financeCalculator.el);
-        this.childViews.push(financeCalculator);
 
         break;
       // finance first
       case 'finance':
-        financeCalculator = new Calculator.Views.FinanceCalculator({data:this.options.data});
-        financeCalculator.render();
         this.$el.append(financeCalculator.el);
-        this.childViews.push(financeCalculator);
-
-        leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data});
-        leaseCalculator.render();
         this.$el.append(leaseCalculator.el);
-        this.childViews.push(leaseCalculator);
 
         break;
       // lease first
       default:
-        leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data});
-        leaseCalculator.render();
         this.$el.append(leaseCalculator.el);
-        this.childViews.push(leaseCalculator);
-
-        financeCalculator = new Calculator.Views.FinanceCalculator({data:this.options.data});
-        financeCalculator.render();
         this.$el.append(financeCalculator.el);
-        this.childViews.push(financeCalculator);
 
         break;
     }
@@ -387,24 +382,15 @@ Calculator.Views.Main = Backbone.View.extend({
     if (this.options.thirdColumn) {
       switch (this.options.thirdColumn) {
         case 'lease':
-          leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data});
-          leaseCalculator.render();
           this.$el.append(leaseCalculator.el);
-          this.childViews.push(leaseCalculator);
 
           break;
         case 'finance':
-          financeCalculator = new Calculator.Views.FinanceCalculator({data:this.options.data});
-          financeCalculator.render();
           this.$el.append(financeCalculator.el);
-          this.childViews.push(financeCalculator);
 
           break;
         default:
-          leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data});
-          leaseCalculator.render();
           this.$el.append(leaseCalculator.el);
-          this.childViews.push(leaseCalculator);
 
           break;
       }
@@ -412,7 +398,7 @@ Calculator.Views.Main = Backbone.View.extend({
       this.buildAddColumn(); // if no 3rd column is specified, we'll add the UI to add one.
     }
 
-    var footer = new Calculator.Views.Footer();
+    var footer = new Calculator.Views.Footer({strings:this.options.strings});
     footer.render();
     this.childViews.push(footer);
     this.$el.append(footer.el);
@@ -423,17 +409,14 @@ Calculator.Views.Main = Backbone.View.extend({
   },
 
   buildAddColumn: function () {
+    var addLeaseLink = $('<a href="'+window.location.hash+'" id="addLeaseColumn" class="calc-link-add">'+this.options.strings.AddLeaseLinkText+'</a>');
+    var addFinanceLink =$('<a href="'+window.location.hash+'" id="addFinanceColumn" class="calc-link-add">'+this.options.strings.AddFinanceLinkText+'</a>');
+    var linkContainer = $('<div class="calc-wrapper add-column"></div>');
 
-    // create and add a column that allows the user to add either a lease or finance callculator to the 3rd
-    // column in the window
-    //var addLeaseLink = this.make('a', { 'href': window.location.hash, 'id': 'addLeaseColumn', 'class': 'calc-link-add' }, 'Add Lease');
-    //var addFinanceLink = this.make('a', { 'href': window.location.hash, 'id': 'addFinanceColumn', 'class': 'calc-link-add' }, 'Add Finance' );
-    //var linkContainer = this.make('div', { 'class': 'calc-wrapper add-column' });
+    $(linkContainer).html(addLeaseLink);
+    $(linkContainer).append(addFinanceLink);
 
-    //$(linkContainer).html(addLeaseLink);
-    //$(linkContainer).append(addFinanceLink);
-
-    //this.$el.append(linkContainer);
+    this.$el.append(linkContainer);
 
     return this;
   },
@@ -447,29 +430,31 @@ Calculator.Views.Main = Backbone.View.extend({
   addLeaseColumn: function (e) {
     e.preventDefault();
     this.close();
-    var calculator = new Calculator.Views.Main({ type: this.options.type, thirdColumn: 'lease' });
-    return calculator;
+    var calculator = new Calculator.Views.Main({ container: this.options.container, type: this.options.type, data:this.options.data, strings:this.options.strings, thirdColumn: 'lease' });
+    this.$container.html(calculator.el);
   },
 
   addFinanceColumn: function (e) {
     e.preventDefault();
     this.close();
-    var calculator = new Calculator.Views.Main({ type: this.options.type, thirdColumn: 'finance' });
-    return calculator;
+    var calculator = new Calculator.Views.Main({ container: this.options.container,type: this.options.type, data:this.options.data, strings:this.options.strings, thirdColumn: 'finance' });
+    this.$container.html(calculator.el);
   },
 
   // handles the click event on the Lease Estimator button
   showLeaseCalculator: function (e) {
     e.preventDefault();
-    var calculator = new Calculator.Views.Main({ type: 'lease' });
-    return calculator;
+    this.close();
+    var calculator = new Calculator.Views.Main({ container: this.options.container,type: 'lease', data:this.options.data, strings:this.options.strings });
+    this.$container.html(calculator.el);
   },
 
   // handles the click event on the Finance Estimator button
   showFinanceCalculator: function (e) {
     e.preventDefault();
-    var calculator = new Calculator.Views.Main({ type: 'finance' });
-    return calculator;
+    this.close();
+    var calculator = new Calculator.Views.Main({ container: this.options.container,type: 'finance', data:this.options.data, strings:this.options.strings });
+    this.$container.html(calculator.el);
   },
 
   onClose: function () {
@@ -485,7 +470,7 @@ Calculator.Views.Header = Backbone.View.extend({
     var view = this;
 
     namespace.fetchTemplate(this.template, function (tmpl) {
-      view.el.innerHTML = tmpl({ strings: {"WindowTitle":"Calculator","LeaseTitle": "Lease","FinanceTitle":"Finance"}, type: view.options.type });
+      view.el.innerHTML = tmpl({ strings: view.options.strings, type: view.options.type });
       view = null;
     });
 
@@ -500,7 +485,7 @@ Calculator.Views.Footer = Backbone.View.extend({
     var view = this;
 
     namespace.fetchTemplate(this.template, function (tmpl) {
-      view.el.innerHTML = tmpl({ strings: {"LegalText":"This is the legal copy" }});
+      view.el.innerHTML = tmpl({ strings: view.options.strings});
       view = null;
     });
 
