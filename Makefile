@@ -9,4 +9,6 @@ gh-pages:
 
 	cp -r lib/* ../mini-calculator-ghpages/lib/
 	cp -r j/* ../mini-calculator-ghpages/j/
+	cp -r c/* ../mini-calculator-ghpages/c/
 	cp index.html ../mini-calculator-ghpages
+	cp crossdomain.xml ../mini-calculator-ghpages
