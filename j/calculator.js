@@ -93,6 +93,8 @@ var app = {
       if(window.location.port) d + ':' + window.location.port;
       if(window.location.pathname) d + window.location.pathname;
 
+      console.log(d);
+
       return d;
     },
     lang: 'en'
@@ -122,6 +124,7 @@ var namespace = {
     return def.promise();
   }
 };
+
 Backbone.View.prototype.close = function () {
   // close all the child views that have been stored in this.childViews
   _.each(this.childViews, function (childView) {
@@ -349,7 +352,6 @@ Calculator.Views.Main = Backbone.View.extend({
 
     this.$container = $(this.options.container);
 
-    console.log('about to render', this);
     this.render();
   },
 
