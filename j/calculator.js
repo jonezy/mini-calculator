@@ -90,12 +90,8 @@ var app = {
   configuration: {
     domain: function() {
       var d = window.location.origin;
-      if(window.location.port)
-        d+ ':' + window.location.port;
-
-      if(window.location.path)
-        d + path;
-      console.log(d);
+      if(window.location.port) d + ':' + window.location.port;
+      if(window.location.pathname) d + window.location.pathname;
 
       return d;
     },
