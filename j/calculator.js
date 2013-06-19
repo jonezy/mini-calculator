@@ -89,9 +89,8 @@ var Helpers = {
 var app = {
   configuration: {
     domain: function() {
-      var d = window.location.origin;
-      if(window.location.pathname) d = d + window.location.pathname;
-      console.log(d);
+      var d = window.location.origin + window.location.pathname;
+      console.log('HERE IS THE DOMAIN ', d);
 
       return d;
     },
