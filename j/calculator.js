@@ -90,8 +90,6 @@ var app = {
   configuration: {
     domain: function() {
       var d = window.location.origin + window.location.pathname;
-      console.log('HERE IS THE DOMAIN ', d);
-
       return d;
     },
     lang: 'en'
