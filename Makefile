@@ -8,7 +8,7 @@ gh-pages:
 	mkdir ../mini-calculator-ghpages/c
 
 	cp -r lib/* ../mini-calculator-ghpages/lib/
-	cp -r j/* ../mini-calculator-ghpages/j/
-	cp -r c/* ../mini-calculator-ghpages/c/
-	cp index.html ../mini-calculator-ghpages
+	cp -r j/calculator.min.js ../mini-calculator-ghpages/j/
+	cp -r c/calculator.min.css ../mini-calculator-ghpages/c/
+	cp index-ghpages.html ../mini-calculator-ghpages/index.html
 	cp crossdomain.xml ../mini-calculator-ghpages

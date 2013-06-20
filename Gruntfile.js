@@ -6,12 +6,21 @@ module.exports = function(grunt) {
         banner: '/* <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'j/calculator.js',
-        dest: 'j/calculator.min.js'
+        src: './j/calculator.js',
+        dest: './j/calculator.min.js'
+      }
+    },
+    cssmin: {
+      compress:{
+        files: {
+          './c/calculator.min.css':['./c/calculator.css']
+        }
       }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.registerTask('default',['uglify']);
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+
+  grunt.registerTask('default',['uglify','cssmin']);
 };
