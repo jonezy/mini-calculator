@@ -8,14 +8,27 @@ This project is built using backbone, underscore and jquery (same as mini.ca)
 
 # Goals
 
-1. The ability to do this:
+The ability to do this:
 
-        var calc = new Calculator.Views.Main(options);
-        $('#calculator').html(calc.render().el);
+    var calc = new Calculator.Views.Main(options);
+    $('#calculator').html(calc.render().el);
 
-2. Copy calculator.js and the templates directory into a destination project and it works.
+# Installation
 
-        <script src='js/calculator.js'></script>
+1. `npm install -g grunt-cli`
+2. make
+3. Copy the contents of the ./calculator folder into your project.
+
+        File/Folder                 |  Explanation
+        ----------------------------|------------------------------------
+        calculator.min.js           | goes in /j/
+        calculator-templates/.html  | goes in /j/calculator-templates
+        calculator.min.css          | goes in /c
+        
+4. Add this code to your page (or something similar)
+
+        <link rel="stylesheet" href="c/calculator.min.css">
+        <script src='j/calculator.min.js'></script>
         <script>
             var calc = new Calculator.Views.Main(options);
             $('#calculator').html(calc.render().el);
@@ -23,13 +36,15 @@ This project is built using backbone, underscore and jquery (same as mini.ca)
 
 # Project layout
 
-    js
+    j
       calculator.js
       calculator-templates
         header.html
         main.html
         footer.html
-    test.html
+    c
+      calculator.css
+    index.html
     
 File/Folder         |  Explanation
 --------------------|------------------------------------
