@@ -174,9 +174,7 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
         leaseRate;
 
     _.each(this.options.data[nodeToSearch], function (lr) {
-      if (lr.Term === parseInt(newTerm)) {
-        leaseRate = lr;
-      }
+      if (lr.Term === parseInt(newTerm, 10)) leaseRate = lr;
     });
 
     newModel.set({ term: newTerm });
@@ -207,20 +205,15 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
   hasTerm48: function (nodeToSearch) {
     var hasTerm48 = false;
     _.each(this.options.data[nodeToSearch], function (lr) {
-      if (parseInt(lr.Term) === 48) {
-        hasTerm48 = true;
-      }
+      if (parseInt(lr.Term, 10) === 48) hasTerm48 = true;
     });
-
     return hasTerm48;
   },
 
   hasTerm: function (nodeToSearch, termToSearchFor) {
     var hasTerm = false;
     _.each(this.options.data[nodeToSearch], function (lr) {
-      if (parseInt(lr.Term) === termToSearchFor) {
-        hasTerm = true;
-      }
+      if (parseInt(lr.Term, 10) === termToSearchFor) hasTerm = true;
     });
 
     return hasTerm;
