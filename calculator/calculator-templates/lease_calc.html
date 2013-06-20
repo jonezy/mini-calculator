@@ -1,0 +1,57 @@
+﻿<h4 class="calc"><%= strings.LeaseTitle %></h4>
+<table>
+<tr>
+  <td><%= strings.ConfiguredPriceLabel %></td>
+  <td align="right"><% if(lang === 'en') { %>$ <% } %><%= displayPrice %><% if(lang === 'fr') { %> $<% } %></td>
+</tr>
+<tr>
+  <td valign="bottom">
+    <%= strings.TermLabel %> 
+    <button class="term btn" data-term='24' style="margin-left:24px;">24</button>
+    <button class="term btn" data-term='36'>36</button>
+    <% if(showTerm39) { %>
+      <button class="term btn" data-term='39'>39</button>
+    <% } %>
+    <% if(showTerm48) { %>
+      <button class="term btn" data-term='48'>48</button>
+    <% } %>
+  </td>
+  <td align="right"><%= data.term %></td>
+</tr>
+<tr>
+  <td valign="bottom">
+    <%= strings.KmYearLabel %>
+    <button class="kms btn" data-kms='12' style="margin-left:5px;">12</button>
+    <button class="kms btn" data-kms='16'>16</button>
+    <button class="kms btn" data-kms='20'>20</button>
+    <button class="kms btn" data-kms='24'>24</button>
+  </td>
+  <td align="right"><%= data.kms %></td>
+</tr>
+<tr>
+  <td valign="middle"><%= strings.DownpaymentLabel %></td>
+  <td align="right"><% if(lang === 'en') { %>$ <% } %><input type="text" id="txtDownPmt" style="width:55px;margin-bottom:0px;" value="<%= data.downPayment %>" /><% if(lang === 'fr') { %> $<% } %></td>
+</tr>
+</table>
+<hr class="dotted" />
+<table>
+<tr>
+  <td width="50%" valign="middle" align="center">
+    <%= strings.MonthlyPaymentLabel %>
+    <h1><% if(lang === 'en') { %>$ <% } %><%= payment %><% if(lang === 'fr') { %> $<% } %> <sup>*</sup></h1>
+  </td>
+  <td width="50%" valign="middle" align="center"> 
+    <%= strings.InterestRateLabel %>
+    <h1><%= data.interestRate %> <sup>%</sup></h1>
+  </td>
+</tr>
+</table>
+<hr class="dotted" />
+<table>
+<tr>
+  <td align="right">
+    <button class="btn btn-large calculator-submit pull-right" id="caclulatePayment"><%= strings.CalculateLabel %></button>
+  </td>
+</tr>
+</table>
+
