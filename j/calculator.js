@@ -88,10 +88,7 @@ var Helpers = {
 
 var app = {
   configuration: {
-    domain: function() {
-      var d = window.location.origin + window.location.pathname;
-      return d;
-    },
+    domain: window.location.origin + window.location.pathname,
     lang: 'en'
   }
 };
@@ -251,7 +248,7 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
 });
 
 Calculator.Views.LeaseCalculator = Calculator.Views.BaseCalculatorView.extend({
-  template: app.configuration.domain() + "/j/calculator-templates/lease_calc.html",
+  template: app.configuration.domain + "j/calculator-templates/lease_calc.html",
 
   initialize: function () {
     this.type = 'LeaseRates';
@@ -282,7 +279,7 @@ Calculator.Views.LeaseCalculator = Calculator.Views.BaseCalculatorView.extend({
 });
 
 Calculator.Views.FinanceCalculator = Calculator.Views.BaseCalculatorView.extend({
-  template: app.configuration.domain() + "/j/calculator-templates/finance_calc.html",
+  template: app.configuration.domain + "j/calculator-templates/finance_calc.html",
 
   initialize: function () {
     this.type = 'FinanceRates';
@@ -460,7 +457,7 @@ Calculator.Views.Main = Backbone.View.extend({
 // contains all the header information for the calculator window.
 Calculator.Views.Header = Backbone.View.extend({
   className: 'modal-header',
-  template: app.configuration.domain() + "/j/calculator-templates/calculator_header.html",
+  template: app.configuration.domain + "j/calculator-templates/calculator_header.html",
 
   render: function () {
     var view = this;
@@ -476,7 +473,7 @@ Calculator.Views.Header = Backbone.View.extend({
 
 // contains all the footer information for the calculator modal window.
 Calculator.Views.Footer = Backbone.View.extend({
-  template: app.configuration.domain() + "/j//calculator-templates/calculator_footer.html",
+  template: app.configuration.domain + "j/calculator-templates/calculator_footer.html",
   render: function () {
     var view = this;
 
