@@ -1,91 +1,6 @@
 ﻿// need to figure out what to do with these helpers, namespace and toMoney stuff
 //
-Number.prototype.toMoney = function (decimals, decimal_sep, thousands_sep) {
-  var n = this,
-  l = 'en',
-  c = isNaN(decimals) ? 2 : Math.abs(decimals), //if decimal is zero we must take it, it means user does not want to show any decimal
-  d = decimal_sep || '.', //if no decimal separator is passed we use the dot as default decimal separator (we MUST use a decimal separator)
-  t = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep, //if you don't want to use a thousands separator you can pass empty string as thousands_sep value
-
-  sign = (n < 0) ? '-' : '',
-
-  i = parseInt(n = Math.abs(n).toFixed(c)) + '',
-
-  j = ((j = i.length) > 3) ? j % 3 : 0;
-
-  if (l === 'fr') {
-    d = ',';
-    t = ' ';
-  }
-
-  return sign + (j ? i.substr(0, j) + t : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : '');
-};
-
-var Helpers = {
-  calculateLeaseRate: function(vehicle, term, price) {
-    // first, grab the rate information for the vehicle and term requested
-    var leaseRate;
-     _.each(vehicle.LeaseRates, function(lr) {
-      if(lr.Term === parseInt(term)) {
-       leaseRate = lr;
-      }
-    });
-
-    if(leaseRate !== undefined) {
-      return Helpers.fullCalculateLeaseRate(leaseRate.InterestRate, leaseRate.ResidualRate, term, price, leaseRate.DownPayment, 20);
-    } else {
-      return null;
-    }
-  },
-
-  fullCalculateLeaseRate: function(ir, residualpct, term, pv,dp,km) {
-    switch (parseInt(km)) {
-      case 12:
-        residualpct = residualpct + 4;
-        break;
-      case 16:
-        residualpct = residualpct + 3;
-        break;
-      case 20:
-        residualpct = residualpct + 2;
-        break;
-      case 24:
-        residualpct = residualpct + 0;
-        break;
-      default:
-        residualpct = residualpct + 0;
-        break;
-    }
-
-    pv = pv - dp;   // set the new pv
-    var interest = ir / 100;
-    var residual_value_pct = residualpct / 100;
-    var residual_value = pv * residual_value_pct;
-    var interest_monthly = interest / 12;
-    var depreciated_value = pv - residual_value;
-    var monthly_pmt = this.roundNumber(depreciated_value / term, 2);
-    var money_factor = (interest / 2400) * 100;
-    var interest_per_term = interest_monthly * term;
-    var pv_rv = this.roundNumber(pv, 10) + this.roundNumber(residual_value, 10);
-    var finance_charge = (pv_rv * money_factor) - (interest_per_term);
-    var pmt = monthly_pmt + finance_charge;
-
-    return this.roundNumber(pmt, 2);
-  },
-
-  calculateFinanceRate: function(ir, term, pv, dp) {
-    pv = pv - dp;
-    var interest_monthly = (ir / 100) / 12;
-    var pmt = (pv * interest_monthly) / (1 - (Math.pow((1 + interest_monthly), -term)));
-    return this.roundNumber(pmt, 2);
-  },
-
-  roundNumber: function(num, dec) {
-    var result = Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
-    return result;
-  }
-};
-
+// this has to be passed in externally.
 var app = {
   configuration: {
     domain: window.location.origin + window.location.pathname,
@@ -93,52 +8,7 @@ var app = {
   }
 };
 
-var namespace = {
-  module: function(opts) {
-    return _.extend({ Views: {} }, opts);
-  },
 
-  fetchTemplate: function (path, done) {
-    var JST = this.JST = this.JST || {};
-    var def = new $.Deferred();
-
-    if (JST[path]) {
-      done(JST[path]);
-      return def.resolve(JST[path]);
-    }
-
-    $.get(path, function (contents) {
-      var tmpl = _.template(contents);
-      done(JST[path] = tmpl);
-      def.resolve(JST[path]);
-    }, "text");
-
-    return def.promise();
-  }
-};
-
-Backbone.View.prototype.close = function () {
-  // close all the child views that have been stored in this.childViews
-  _.each(this.childViews, function (childView) {
-    if (childView.remove) {
-      childView.remove();
-    }
-
-    if (childView.close) {
-      childView.close();
-    }
-  });
-
-  // handle cleaning up this view
-  this.off();
-  this.remove();
-
-  if (this.onClose) {
-    this.onClose();
-  }
-
-  return this;
-};
 
 var Calculator = namespace.module();
 

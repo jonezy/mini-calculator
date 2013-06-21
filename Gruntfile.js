@@ -6,9 +6,14 @@ module.exports = function(grunt) {
         banner: '/* <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: './j/calculator.js',
-        dest: './j/calculator.min.js'
+        files: {
+          './j/calculator.min.js': ['./j/extensions.js','./j/namespace.js', './j/helpers.js','./j/calculator.js']
+        }
       }
+      //build: {
+        //src: './j/calculator.js',
+        //dest: './j/calculator.min.js'
+      //}
     },
     cssmin: {
       compress:{
