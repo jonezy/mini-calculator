@@ -49,9 +49,9 @@ Calculator.Views.BaseCalculatorView = Backbone.View.extend({
     newModel.set({ residual: leaseRate.ResidualRate });
 
     if (app.configuration.language === 'en') {
-      newModel.set({ price: parseInt(this.options.data.Price.replace(',', '')) });
+      newModel.set({ price: parseInt(this.options.data.Price.replace(',', ''),10) });
     } else {
-      newModel.set({ price: parseInt(this.options.data.Price.replace(',', '.').replace(' ', '')) });
+      newModel.set({ price: parseInt(this.options.data.Price.replace(',', '.').replace(' ', ''), 10) });
     }
 
     if (this.model !== undefined && this.model.get('downPayment')) {
@@ -205,6 +205,10 @@ Calculator.Views.Main = Backbone.View.extend({
     if(typeof(this.options.data) !== 'object')
       this.options.data = JSON.parse(this.options.data);
 
+    if(this.options.lang) 
+      app.configuration.lang = this.options.lang;
+
+
     this.$container = $(this.options.container);
 
     this.render();
@@ -243,6 +247,8 @@ Calculator.Views.Main = Backbone.View.extend({
 
     // if we've been asked to add a 3rd column
     if (this.options.thirdColumn) {
+      leaseCalculator = new Calculator.Views.LeaseCalculator({data:this.options.data, strings:this.options.strings}).render();
+      financeCalculator = new Calculator.Views.FinanceCalculator({data:this.options.data, strings:this.options.strings}).render();
       switch (this.options.thirdColumn) {
         case 'lease':
           this.$el.append(leaseCalculator.el);
@@ -266,8 +272,6 @@ Calculator.Views.Main = Backbone.View.extend({
     this.childViews.push(footer);
     this.$el.append(footer.el);
 
-    this.postRender();
-
     return this;
   },
 
@@ -284,24 +288,18 @@ Calculator.Views.Main = Backbone.View.extend({
     return this;
   },
 
-  // runs after the main views render function has been executed
-  postRender: function () {
-    var view = this;
-    return this;
-  },
-
   addLeaseColumn: function (e) {
     e.preventDefault();
     this.close();
-    var calculator = new Calculator.Views.Main({ container: this.options.container, type: this.options.type, data:this.options.data, strings:this.options.strings, thirdColumn: 'lease' });
-    this.$container.html(calculator.el);
+    var calculator = new Calculator.Views.Main({container: this.options.container,data:this.options.data, type:'lease', strings:this.options.strings, thirdColumn: 'lease'}).render();
+    this.$container.append(calculator.el);
   },
 
   addFinanceColumn: function (e) {
     e.preventDefault();
     this.close();
-    var calculator = new Calculator.Views.Main({ container: this.options.container,type: this.options.type, data:this.options.data, strings:this.options.strings, thirdColumn: 'finance' });
-    this.$container.html(calculator.el);
+    var calculator = new Calculator.Views.Main({container: this.options.container,data:this.options.data, type:'finance', strings:this.options.strings, thirdColumn:'finance'}).render();
+    this.$container.append(calculator.el);
   },
 
   // handles the click event on the Lease Estimator button
@@ -309,7 +307,7 @@ Calculator.Views.Main = Backbone.View.extend({
     e.preventDefault();
     this.close();
     var calculator = new Calculator.Views.Main({ container: this.options.container,type: 'lease', data:this.options.data, strings:this.options.strings });
-    this.$container.html(calculator.el);
+    this.$container.append(calculator.el);
   },
 
   // handles the click event on the Finance Estimator button
@@ -317,7 +315,7 @@ Calculator.Views.Main = Backbone.View.extend({
     e.preventDefault();
     this.close();
     var calculator = new Calculator.Views.Main({ container: this.options.container,type: 'finance', data:this.options.data, strings:this.options.strings });
-    this.$container.html(calculator.el);
+    this.$container.append(calculator.el);
   },
 
   onClose: function () {
