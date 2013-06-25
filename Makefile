@@ -5,9 +5,9 @@ build:
 	mkdir ./calculator
 	mkdir ./calculator/calculator-templates
 	
-	cp j/calculator.min.js ./calculator
-	cp -r j/calculator-templates ./calculator/
-	cp ./c/calculator.min.css ./calculator
+	cp ./src/j/calculator.min.js ./calculator
+	cp -r ./src/j/calculator-templates ./calculator/
+	cp ./src/c/calculator.min.css ./calculator
 
 gh-pages: 
 	grunt
@@ -20,9 +20,9 @@ gh-pages:
 	mkdir ../mini-calculator-ghpages/j
 	mkdir ../mini-calculator-ghpages/c
 
-	cp -r lib/* ../mini-calculator-ghpages/lib/
-	cp -r j/calculator.min.js ../mini-calculator-ghpages/j/
-	cp -r j/calculator-templates ../mini-calculator-ghpages/j/
-	cp -r c/calculator.min.css ../mini-calculator-ghpages/c/
-	cp index-ghpages.html ../mini-calculator-ghpages/index.html
-	cp crossdomain.xml ../mini-calculator-ghpages
+	cp -r ./src/lib/* ../mini-calculator-ghpages/lib/
+	cp -r ./src/j/calculator.min.js ../mini-calculator-ghpages/j/
+	cp -r ./src/j/calculator-templates ../mini-calculator-ghpages/j/
+	cp -r ./src/c/calculator.min.css ../mini-calculator-ghpages/c/
+	cp ./src/index-ghpages.html ../mini-calculator-ghpages/index.html
+	cp ./src/crossdomain.xml ../mini-calculator-ghpages

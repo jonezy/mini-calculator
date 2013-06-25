@@ -7,18 +7,14 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
-          './j/calculator.min.js': ['./j/extensions.js','./j/namespace.js', './j/helpers.js','./j/calculator.js']
+          './src/j/calculator.min.js': ['./src/j/extensions.js','./src/j/namespace.js', './src/j/helpers.js','./src/j/calculator.js']
         }
       }
-      //build: {
-        //src: './j/calculator.js',
-        //dest: './j/calculator.min.js'
-      //}
     },
     cssmin: {
       compress:{
         files: {
-          './c/calculator.min.css':['./c/calculator.css']
+          './src/c/calculator.min.css':['./src/c/calculator.css']
         }
       }
     }
