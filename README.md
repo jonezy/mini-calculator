@@ -17,7 +17,7 @@ The ability to do this:
 
 1. `npm install -g grunt-cli`
 2. make
-3. Copy the contents of the ./calculator folder into your project.
+3. Copy the contents of the ./dist folder into your project.
 
         File/Folder                 |  Explanation
         ----------------------------|------------------------------------

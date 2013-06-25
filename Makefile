@@ -1,13 +1,13 @@
 build:
 	grunt
 	
-	rm -rf ./calculator
-	mkdir ./calculator
-	mkdir ./calculator/calculator-templates
+	rm -rf ./dist
+	mkdir ./dist
+	mkdir ./dist/calculator-templates
 	
-	cp ./src/j/calculator.min.js ./calculator
-	cp -r ./src/j/calculator-templates ./calculator/
-	cp ./src/c/calculator.min.css ./calculator
+	cp ./src/j/calculator.min.js ./dist
+	cp -r ./src/j/calculator-templates ./dist
+	cp ./src/c/calculator.min.css ./dist
 
 gh-pages: 
 	grunt
